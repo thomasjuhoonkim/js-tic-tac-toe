@@ -1,0 +1,51 @@
+.app {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.app h1 {
+  text-align: center;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 150px);
+  grid-template-rows: repeat(3, 150px);
+  border: 2px solid black;
+}
+
+.slot {
+  font-size: 100px;
+  border: 2px solid black;
+  line-height: 150px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.choose-player {
+  margin: 25px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+.player {
+  background: white;
+  border: 3px solid black;
+  padding: 10px 50px;
+  font-size: 25px;
+  cursor: pointer;
+}
+.selected {
+  background: gray;
+}
+
+.restart {
+  z-index: 1;
+  background: rgba(255, 255, 255 0.25);
+}
+.restart-button {
+  content: "Restart Game";
+  padding: 10px 50px;
+}
