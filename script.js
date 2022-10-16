@@ -5,7 +5,12 @@ var globalPlayer = null;
 
 // slot factory
 const slotFactory = (num) => {
-  const element = document.getElementById(String(num));
+  // build board
+  const element = document.createElement("div");
+  element.classList.add("slot");
+  element.id = String(num);
+  document.querySelector(".board").appendChild(element);
+
   const addPlayerMark = (e) => {
     if (!globalPlayer) return;
     e.target.innerText = globalPlayer.player;
@@ -27,6 +32,9 @@ const slotFactory = (num) => {
 
 // board factory
 const boardFactory = () => {
+  // reset first
+  document.querySelectorAll(".slot").forEach((slot) => slot.remove());
+
   // make board
   let boardArray = [];
   for (let i = 0; i < ROW_COUNT; i++) {
@@ -80,6 +88,8 @@ const boardFactory = () => {
     boardArray.forEach((row) => {
       row.forEach((slot) => slot.removeEventEndGame());
     });
+
+    restartGameScreen();
   };
   const check = () => {
     winningSlots = checkBoard();
@@ -92,6 +102,7 @@ const boardFactory = () => {
           player.element.style.cursor = "default";
         }
       });
+      endGame();
       return;
     }
     if (winningSlots.length > 0) {
@@ -103,6 +114,7 @@ const boardFactory = () => {
       endGame();
     }
   };
+
   return { boardArray, check };
 };
 
@@ -126,12 +138,40 @@ const switchPlayer = (e) => {
 // player factory
 const playerFactory = (player) => {
   const element = document.getElementById(player);
+  element.classList.remove("selected");
+  element.style.cursor = "pointer";
   element.addEventListener("click", switchPlayer);
   return { player, element };
 };
 
-let board = boardFactory();
-let players = { X: playerFactory("X"), O: playerFactory("O") };
+const restartGameScreen = () => {
+  // restart page
+  const restart = document.createElement("div");
+  restart.classList.add("restart");
 
-// restart button
-const restartButton = document.createElement("div");
+  const restartText = document.createElement("h2");
+  restartText.innerText = "Game Over!";
+  restartText.classList.add("restart-text");
+  restart.appendChild(restartText);
+
+  const restartButton = document.createElement("button");
+  restartButton.innerText = "Restart Game";
+  restartButton.classList.add("restart-button");
+  restartButton.addEventListener("click", start);
+  restart.appendChild(restartButton);
+
+  // add it
+  document.querySelector("body").appendChild(restart);
+};
+
+const start = () => {
+  document
+    .querySelector("body")
+    .removeChild(document.querySelector(".restart"));
+  board = boardFactory();
+  players = { X: playerFactory("X"), O: playerFactory("O") };
+  globalPlayer = null;
+};
+
+var board = boardFactory();
+var players = { X: playerFactory("X"), O: playerFactory("O") };
