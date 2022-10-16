@@ -9,6 +9,7 @@ const slotFactory = (num) => {
   const element = document.createElement("div");
   element.classList.add("slot");
   element.id = String(num);
+  element.addEventListener("click", addPlayerMark);
   document.querySelector(".board").appendChild(element);
 
   const addPlayerMark = (e) => {
@@ -26,7 +27,6 @@ const slotFactory = (num) => {
     element.removeEventListener("click", addPlayerMark);
     element.style.cursor = "default";
   };
-  element.addEventListener("click", addPlayerMark);
   return { num, element, removeEventEndGame };
 };
 
