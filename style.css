@@ -1,13 +1,17 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
 h1,
 h3 {
   text-align: center;
 }
 
-.app {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+h1 {
+  margin-bottom: -10px;
 }
 
 .board {
@@ -23,6 +27,7 @@ h3 {
   line-height: 150px;
   text-align: center;
   cursor: pointer;
+  background: white;
 }
 
 .choose-player {
@@ -38,10 +43,12 @@ h3 {
   font-size: 25px;
   cursor: pointer;
 }
+#X {
+  background: gray;
+}
 .selected {
   background: gray;
 }
-
 .restart {
   background: rgba(255, 255, 255, 0.75);
   position: absolute;
@@ -68,4 +75,24 @@ h3 {
 }
 .restart-button:hover {
   background: lightgray;
+}
+
+footer {
+  position: absolute;
+  bottom: 0%;
+}
+
+@media screen and (max-width: 800px) {
+  .board {
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+  }
+  .slot {
+    font-size: 75px;
+    line-height: 100px;
+  }
+  .player {
+    font-size: 17.5px;
+    padding: 7.5px 35px;
+  }
 }

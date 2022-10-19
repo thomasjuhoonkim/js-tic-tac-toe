@@ -79,7 +79,7 @@ const resetSlots = () => {
 const resetPlayers = () => {
   const X = document.getElementById("X");
   const O = document.getElementById("O");
-  X.style.background = "white";
+  X.style.background = "gray";
   O.style.background = "white";
   player = "X";
 };
