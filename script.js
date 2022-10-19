@@ -1,176 +1,132 @@
-// constants and global variables
 const ROW_COUNT = 3;
 const COL_COUNT = 3;
-var globalPlayer = null;
+var player = "X";
 
-// slot factory
-const slotFactory = (num) => {
-  const addPlayerMark = (e) => {
-    if (!globalPlayer) return;
-    e.target.innerText = globalPlayer.player;
-    removeEvent(e);
-    switchPlayer();
-    board.check();
-  };
-  const removeEvent = (e) => {
-    e.target.removeEventListener("click", addPlayerMark);
-    e.target.style.cursor = "default";
-  };
-  const removeEventEndGame = () => {
-    element.removeEventListener("click", addPlayerMark);
-    element.style.cursor = "default";
-  };
-  // build board
-  const element = document.createElement("div");
-  element.classList.add("slot");
-  element.id = String(num);
-  element.addEventListener("click", addPlayerMark);
-  document.querySelector(".board").appendChild(element);
-  return { num, element, removeEventEndGame };
+const switchPlayer = () => {
+  const X = document.getElementById("X");
+  const O = document.getElementById("O");
+  if (player === "X") {
+    X.style.background = "white";
+    O.style.background = "gray";
+    player = "O";
+  } else {
+    O.style.background = "white";
+    X.style.background = "gray";
+    player = "X";
+  }
 };
+const checkBoard = () => {
+  const boardArray = getBoard();
+  // check row and col
+  for (let i = 0; i < ROW_COUNT; i++) {
+    row = [boardArray[i][0], boardArray[i][1], boardArray[i][2]];
+    col = [boardArray[0][i], boardArray[1][i], boardArray[2][i]];
+    if (row.every((slot) => slot.innerText === "X")) return row;
+    if (row.every((slot) => slot.innerText === "O")) return row;
+    if (col.every((slot) => slot.innerText === "X")) return col;
+    if (col.every((slot) => slot.innerText === "O")) return col;
+  }
+  // check diagonal
+  diagonalLeft = [boardArray[0][0], boardArray[1][1], boardArray[2][2]];
+  diagonalRight = [boardArray[2][0], boardArray[1][1], boardArray[0][2]];
+  if (diagonalLeft.every((slot) => slot.innerText === "X")) return diagonalLeft;
+  if (diagonalLeft.every((slot) => slot.innerText === "O")) return diagonalLeft;
+  if (diagonalRight.every((slot) => slot.innerText === "X"))
+    return diagonalRight;
+  if (diagonalRight.every((slot) => slot.innerText === "O"))
+    return diagonalRight;
 
-// board factory
-const boardFactory = () => {
-  // reset first
-  document.querySelectorAll(".slot").forEach((slot) => slot.remove());
+  // check tie
+  const slots = Array.from(document.querySelectorAll(".slot"));
+  if (slots.every((slot) => slot.innerText.length > 0)) return slots;
 
-  // make board
-  let boardArray = [];
+  // nothing
+  return [];
+};
+const setColor = (color, slots) => {
+  slots.forEach((slot) => (slot.style.color = color));
+};
+const check = () => {
+  const winningSlots = checkBoard();
+  if (winningSlots.length === 9) {
+    setColor("orange", winningSlots);
+    restartScreen("Tie!");
+  } else if (winningSlots.length === 3) {
+    setColor("green", winningSlots);
+    restartScreen(winningSlots[0].innerText + " Wins!");
+  }
+};
+const play = (e) => {
+  e.target.removeEventListener("click", play);
+  e.target.innerText = player;
+  e.target.style.cursor = "default";
+  switchPlayer();
+  check();
+};
+const initializeSlots = () => {
+  const slots = document.querySelectorAll(".slot");
+  slots.forEach((slot) => slot.addEventListener("click", play));
+};
+const resetSlots = () => {
+  const slots = document.querySelectorAll(".slot");
+  slots.forEach((slot) => {
+    slot.removeEventListener("click", play);
+    slot.innerText = "";
+    slot.style.color = "black";
+    slot.style.cursor = "pointer";
+  });
+};
+const resetPlayers = () => {
+  const X = document.getElementById("X");
+  const O = document.getElementById("O");
+  X.style.background = "white";
+  O.style.background = "white";
+  player = "X";
+};
+const getBoard = () => {
+  const slots = Array.from(document.querySelectorAll(".slot"));
+  let board = [];
   for (let i = 0; i < ROW_COUNT; i++) {
     row = [];
     for (let j = 0; j < COL_COUNT; j++) {
-      row.push(slotFactory(ROW_COUNT * i + j));
+      const slot = slots.shift();
+      row.push(slot);
     }
-    boardArray.push(row);
+    board.push(row);
   }
-
-  // check board items and return winning slots
-  const checkBoard = () => {
-    // check row and col
-    for (let i = 0; i < ROW_COUNT; i++) {
-      row = [boardArray[i][0], boardArray[i][1], boardArray[i][2]];
-      col = [boardArray[0][i], boardArray[1][i], boardArray[2][i]];
-      if (row.every((slot) => slot.element.innerText === "X")) return row;
-      if (row.every((slot) => slot.element.innerText === "O")) return row;
-      if (col.every((slot) => slot.element.innerText === "X")) return col;
-      if (col.every((slot) => slot.element.innerText === "O")) return col;
-    }
-    // check diagonal
-    diagonalLeft = [boardArray[0][0], boardArray[1][1], boardArray[2][2]];
-    diagonalRight = [boardArray[2][0], boardArray[1][1], boardArray[0][2]];
-    if (diagonalLeft.every((slot) => slot.element.innerText === "X"))
-      return diagonalLeft;
-    if (diagonalLeft.every((slot) => slot.element.innerText === "O"))
-      return diagonalLeft;
-    if (diagonalRight.every((slot) => slot.element.innerText === "X"))
-      return diagonalRight;
-    if (diagonalRight.every((slot) => slot.element.innerText === "O"))
-      return diagonalRight;
-
-    checkTie = [];
-    for (let i = 0; i < ROW_COUNT; i++) {
-      for (let j = 0; j < COL_COUNT; j++) {
-        checkTie.push(boardArray[i][j]);
-      }
-    }
-    if (
-      checkTie.every(
-        (slot) =>
-          slot.element.innerText === "X" || slot.element.innerText === "O"
-      )
-    )
-      return checkTie;
-    // nothing checks out
-    return [];
-  };
-  const endGame = () => {
-    boardArray.forEach((row) => {
-      row.forEach((slot) => slot.removeEventEndGame());
-    });
-
-    restartGameScreen();
-  };
-  const check = () => {
-    winningSlots = checkBoard();
-    // tie
-    if (winningSlots.length === 9) {
-      winningSlots.forEach((slot) => {
-        slot.element.style.color = "orange";
-        for (player of Object.values(players)) {
-          player.element.classList.add("selected");
-          player.element.style.cursor = "default";
-        }
-      });
-      endGame();
-      return;
-    }
-    if (winningSlots.length > 0) {
-      winningSlots.forEach((slot) => (slot.element.style.color = "green"));
-      for (player of Object.values(players)) {
-        player.element.classList.add("selected");
-        player.element.style.cursor = "default";
-      }
-      endGame();
-    }
-  };
-
-  return { boardArray, check };
+  return board;
 };
 
-// switch player
-const switchPlayer = (e) => {
-  if (!globalPlayer) {
-    globalPlayer = players[e.target.innerText];
-    e.target.classList.add("selected");
-    for (player of Object.values(players)) {
-      player.element.removeEventListener("click", switchPlayer);
-      player.element.style.cursor = "default";
-    }
-    return;
-  }
-  globalPlayer.element.classList.remove("selected");
-  if (globalPlayer.player === "X") globalPlayer = players["O"];
-  else globalPlayer = players["X"];
-  globalPlayer.element.classList.add("selected");
-};
-
-// player factory
-const playerFactory = (player) => {
-  const element = document.getElementById(player);
-  element.classList.remove("selected");
-  element.style.cursor = "pointer";
-  element.addEventListener("click", switchPlayer);
-  return { player, element };
-};
-
-const restartGameScreen = () => {
-  // restart page
-  const restart = document.createElement("div");
-  restart.classList.add("restart");
+const restartScreen = (status) => {
+  const restartDiv = document.createElement("div");
+  restartDiv.classList.add("restart");
 
   const restartText = document.createElement("h2");
-  restartText.innerText = "Game Over!";
+  restartText.innerText = status;
   restartText.classList.add("restart-text");
-  restart.appendChild(restartText);
+  restartDiv.appendChild(restartText);
 
   const restartButton = document.createElement("button");
   restartButton.innerText = "Restart Game";
   restartButton.classList.add("restart-button");
-  restartButton.addEventListener("click", start);
-  restart.appendChild(restartButton);
+  restartButton.addEventListener("click", restart);
+  restartDiv.appendChild(restartButton);
 
-  // add it
-  document.querySelector("body").appendChild(restart);
+  document.querySelector("body").appendChild(restartDiv);
 };
-
 const start = () => {
+  resetSlots();
+  resetPlayers();
+  initializeSlots();
+};
+const restart = () => {
+  document
+    .querySelector(".restart-button")
+    .removeEventListener("click", restart);
   document
     .querySelector("body")
     .removeChild(document.querySelector(".restart"));
-  board = boardFactory();
-  players = { X: playerFactory("X"), O: playerFactory("O") };
-  globalPlayer = null;
+  start();
 };
 
-var board = boardFactory();
-var players = { X: playerFactory("X"), O: playerFactory("O") };
+start();
