@@ -5,13 +5,6 @@ var globalPlayer = null;
 
 // slot factory
 const slotFactory = (num) => {
-  // build board
-  const element = document.createElement("div");
-  element.classList.add("slot");
-  element.id = String(num);
-  element.addEventListener("click", addPlayerMark);
-  document.querySelector(".board").appendChild(element);
-
   const addPlayerMark = (e) => {
     if (!globalPlayer) return;
     e.target.innerText = globalPlayer.player;
@@ -27,6 +20,12 @@ const slotFactory = (num) => {
     element.removeEventListener("click", addPlayerMark);
     element.style.cursor = "default";
   };
+  // build board
+  const element = document.createElement("div");
+  element.classList.add("slot");
+  element.id = String(num);
+  element.addEventListener("click", addPlayerMark);
+  document.querySelector(".board").appendChild(element);
   return { num, element, removeEventEndGame };
 };
 
